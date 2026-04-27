@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ПарЯрня — Баня в Боярці</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --flame: #C8401A;
+    --ember: #E8692A;
+    --gold: #D4962A;
+    --smoke: #1A1510;
+    --ash: #2E2820;
+    --birch: #F2EAD8;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Golos Text', sans-serif;
+    background: var(--smoke);
+    color: var(--birch);
+    overflow: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--ember);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(232,105,42,0.5);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ── NAVIGATION ── */
+  nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 32px 64px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--birch); letter-spacing: -0.02em;
+    text-decoration: none;
+    animation: fadeDown 0.7s ease both;
+  }
+  .nav-logo span { color: var(--ember); }
+
+  .nav-links {
+    display: flex; gap: 40px; list-style: none;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+  .nav-links a {
+    font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(242,234,216,0.55);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--birch); }
+
+  .nav-cta {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--smoke); background: var(--ember);
+    border: none; padding: 14px 28px; border-radius: 2px;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+    animation: fadeDown 0.7s 0.2s ease both;
+  }
+  .nav-cta:hover { background: var(--flame); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    width: 100vw; height: 100vh;
+    position: relative; overflow: hidden;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  /* Background */
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      url('https://images.unsplash.com/photo-1543739081-6d67a5a07bf8?w=1800&q=80') center/cover no-repeat;
+    transform: scale(1.04);
+    animation: bgZoom 12s ease-out forwards;
+  }
+  @keyframes bgZoom {
+    from { transform: scale(1.08); }
+    to   { transform: scale(1.0); }
+  }
+
+  /* Overlays */
+  .hero-overlay-gradient {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to bottom,
+        rgba(26,21,16,0.55) 0%,
+        rgba(26,21,16,0.1)  35%,
+        rgba(26,21,16,0.15) 55%,
+        rgba(26,21,16,0.92) 100%),
+      linear-gradient(to right,
+        rgba(26,21,16,0.6) 0%,
+        transparent 65%);
+  }
+  .hero-overlay-color {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 62% 68%, rgba(200,64,26,0.28) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 75% 88%, rgba(212,150,42,0.16) 0%, transparent 55%);
+  }
+
+  /* Steam particles */
+  .steam-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .sp {
+    position: absolute; bottom: -40px;
+    background: linear-gradient(to top, transparent, rgba(242,234,216,0.07), transparent);
+    border-radius: 50%; animation: steamRise linear infinite;
+    filter: blur(5px);
+  }
+  @keyframes steamRise {
+    0%   { transform: translateY(0) translateX(0) scaleX(1); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 0.3; }
+    100% { transform: translateY(-105vh) translateX(var(--drift)) scaleX(3.5); opacity: 0; }
+  }
+  .sp1 { left:12%; width:5px; height:130px; animation-duration:8s;  animation-delay:0s;   --drift: 20px; }
+  .sp2 { left:23%; width:3px; height: 90px; animation-duration:10s; animation-delay:1.8s; --drift:-15px; }
+  .sp3 { left:37%; width:4px; height:110px; animation-duration:7s;  animation-delay:3.5s; --drift: 10px; }
+  .sp4 { left:52%; width:6px; height:150px; animation-duration:9s;  animation-delay:0.6s; --drift:-25px; }
+  .sp5 { left:65%; width:3px; height: 80px; animation-duration:11s; animation-delay:2.2s; --drift: 18px; }
+  .sp6 { left:78%; width:4px; height:120px; animation-duration:7.5s;animation-delay:4.2s; --drift:-10px; }
+  .sp7 { left:88%; width:2px; height: 70px; animation-duration:6.5s;animation-delay:1.2s; --drift: 14px; }
+
+  /* Sparks container */
+  .sparks { position: absolute; inset: 0; pointer-events: none; }
+  .spark {
+    position: absolute; width: 2px; height: 2px;
+    background: var(--gold); border-radius: 50%;
+    animation: sparkFloat ease-out infinite; opacity: 0;
+  }
+  @keyframes sparkFloat {
+    0%   { transform: translate(0,0); opacity: 0; }
+    12%  { opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)); opacity: 0; }
+  }
+
+  /* ── MAIN CONTENT ── */
+  .hero-main {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 64px 72px;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold);
+    border: 1px solid rgba(212,150,42,0.28);
+    padding: 9px 18px; border-radius: 2px;
+    width: fit-content; margin-bottom: 36px;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px; background: var(--ember);
+    border-radius: 50%; flex-shrink: 0;
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.45; transform: scale(1.5); }
+  }
+
+  .hero-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(56px, 8.5vw, 108px);
+    font-weight: 900; line-height: 0.93;
+    letter-spacing: -0.04em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.45s ease both;
+  }
+  .t-solid { display: block; color: var(--birch); }
+  .t-outline {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(242,234,216,0.22);
+  }
+  .t-accent { color: var(--ember); }
+
+  .hero-sub {
+    font-size: clamp(15px, 1.8vw, 20px); font-weight: 400;
+    color: rgba(242,234,216,0.62); line-height: 1.6;
+    max-width: 480px; margin-bottom: 44px;
+    animation: fadeUp 0.7s 0.6s ease both;
+  }
+  .hero-sub strong { color: var(--birch); font-weight: 600; }
+
+  /* Actions row */
+  .hero-actions {
+    display: flex; align-items: center; gap: 20px;
+    animation: fadeUp 0.7s 0.75s ease both;
+  }
+  .btn-fire {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--smoke); background: var(--ember);
+    border: none; padding: 20px 44px; border-radius: 2px;
+    cursor: none; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 12px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, background 0.3s;
+    flex-shrink: 0;
+  }
+  .btn-fire::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .btn-fire:hover::after { transform: translateX(100%); }
+  .btn-fire:hover { background: var(--flame); transform: translateY(-2px); }
+
+  .btn-ghost {
+    font-size: 13px; font-weight: 500;
+    color: rgba(242,234,216,0.65);
+    background: none; border: none; cursor: none;
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    transition: color 0.3s;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .btn-ghost:hover { color: var(--birch); }
+  .ghost-circle {
+    width: 46px; height: 46px; flex-shrink: 0;
+    border: 1px solid rgba(242,234,216,0.18);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.3s;
+  }
+  .btn-ghost:hover .ghost-circle { border-color: rgba(242,234,216,0.55); }
+
+  /* ── BOTTOM BAR (Stats) ── */
+  .hero-bottom {
+    position: relative; z-index: 2;
+    display: flex; align-items: stretch;
+    border-top: 1px solid rgba(242,234,216,0.07);
+    animation: fadeUp 0.7s 0.9s ease both;
+  }
+
+  .stat-item {
+    flex: 1;
+    padding: 24px 40px;
+    border-right: 1px solid rgba(242,234,216,0.07);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 36px; font-weight: 300;
+    color: var(--birch); letter-spacing: -0.05em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .stat-num b { font-weight: 900; color: var(--ember); }
+  .stat-label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(242,234,216,0.35);
+    margin-top: 6px;
+  }
+
+  /* Scroll line — left side */
+  .scroll-hint {
+    position: absolute; left: 64px; bottom: 120px;
+    z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    animation: fadeUp 0.7s 1.05s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 52px;
+    background: linear-gradient(to bottom, var(--ember), transparent);
+    animation: scrollAnim 2.2s ease infinite;
+    transform-origin: top;
+  }
+  @keyframes scrollAnim {
+    0%   { transform: scaleY(0); opacity: 1; transform-origin: top; }
+    50%  { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(0); opacity: 0; transform-origin: bottom; }
+  }
+  .scroll-text {
+    font-size: 9px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: rgba(242,234,216,0.28);
+    writing-mode: vertical-rl; transform: rotate(180deg);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero-main { padding: 0 24px 0; }
+    .hero-bottom { flex-direction: row; flex-wrap: wrap; }
+    .stat-item { padding: 16px 24px; min-width: 50%; }
+    .stat-num { font-size: 26px; }
+    .scroll-hint { display: none; }
+    .hero-actions { flex-direction: column; align-items: flex-start; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<section class="hero">
+
+  <!-- BG layers -->
+  <div class="hero-bg"></div>
+  <div class="hero-overlay-gradient"></div>
+  <div class="hero-overlay-color"></div>
+
+  <!-- Steam -->
+  <div class="steam-wrap">
+    <div class="sp sp1"></div>
+    <div class="sp sp2"></div>
+    <div class="sp sp3"></div>
+    <div class="sp sp4"></div>
+    <div class="sp sp5"></div>
+    <div class="sp sp6"></div>
+    <div class="sp sp7"></div>
+  </div>
+
+  <!-- Sparks (JS inject) -->
+  <div class="sparks" id="sparks"></div>
+
+  <!-- Nav -->
+  <nav>
+    <a href="#" class="nav-logo">Пар<span>Ярня</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Послуги</a></li>
+      <li><a href="#">Про нас</a></li>
+      <li><a href="#">Контакти</a></li>
+    </ul>
+    <button class="nav-cta">Забронювати</button>
+  </nav>
+
+  <!-- Main content -->
+  <div class="hero-main">
+
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Баня в Боярці · 30 хв від Києва
+    </div>
+
+    <h1 class="hero-title">
+      <span class="t-solid">СПРАВЖНІЙ</span>
+      <span class="t-outline">ЖАРКИЙ</span>
+      <span class="t-solid t-accent">ПАР</span>
+    </h1>
+
+    <p class="hero-sub">
+      Живий вогонь. Березовий віник. Крижана купіль.<br>
+      <strong>Боярка — 30 хвилин від центру Києва.</strong>
+    </p>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-fire">
+        Забронювати лазню
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="#" class="btn-ghost">
+        <span class="ghost-circle">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Переглянути пакети
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Гортай</span>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="hero-bottom">
+    <div class="stat-item">
+      <div class="stat-num"><b>5</b>+</div>
+      <div class="stat-label">Років роботи</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><b>1200</b>+</div>
+      <div class="stat-label">Задоволених гостей</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><b>90</b>°</div>
+      <div class="stat-label">Температура пари</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><b>24</b>/7</div>
+      <div class="stat-label">Підтримка клієнтів</div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+  // Cursor
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx+'px'; cur.style.top = my+'px';
+  });
+  (function tick() {
+    rx += (mx-rx)*0.11; ry += (my-ry)*0.11;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(tick);
+  })();
+  document.querySelectorAll('a,button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cur.style.width='20px'; cur.style.height='20px';
+      ring.style.width='52px'; ring.style.height='52px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cur.style.width='12px'; cur.style.height='12px';
+      ring.style.width='36px'; ring.style.height='36px';
+    });
+  });
+
+  // Sparks
+  const sc = document.getElementById('sparks');
+  function makeSpark() {
+    const s = document.createElement('div');
+    s.className = 'spark';
+    s.style.left = (42 + Math.random()*30) + '%';
+    s.style.bottom = (8 + Math.random()*18) + '%';
+    s.style.setProperty('--sx', (Math.random()*100-50)+'px');
+    s.style.setProperty('--sy', -(80+Math.random()*200)+'px');
+    s.style.animationDuration = (1.8+Math.random()*2.8)+'s';
+    s.style.animationDelay = (Math.random()*1.5)+'s';
+    sc.appendChild(s);
+    setTimeout(() => s.remove(), 4500);
+  }
+  setInterval(makeSpark, 380);
+</script>
+
+</body>
+</html>
